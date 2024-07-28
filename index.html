@@ -11,23 +11,28 @@
     <header>
         <h1 class="text-white p-2 text-center">Weather DashBoard</h1>
     </header>
-    <div class="col-12 col-lg-3" id="body">
-        <div class="d-flex flex-column border-bottom border-3 m-4" id="Search">
-            <h1 class="">Search for a City:</h1>
-            <input type="text" class="mb-2 p-1" id="search-input">
-            <button class="btn-primary mb-3 rounded p-1" id="search-btn">Search</button>
-        </div>
-        <div id="city-list">
+    <div class="d-flex">
+        <div class="col-12 col-lg-3" id="search">
+            <div class="d-flex flex-column border-bottom border-3 m-4" id="search-area">
+                <h2 class="">Search for a City:</h2>
+                <input type="text" class="mb-2 p-1" id="search-input">
+                <button class="btn-primary mb-3 rounded p-1" id="search-btn">Search</button>
+            </div>
+            <div id="search-history">
 
+            </div>
         </div>
+        <div class="col-12 col-lg-7 d-flex flex-column ml-5" id="forecasts">
+            <div id="current" class="p-4 width-auto"></div>
+            <h3 id="five-day-title" class="pt-3"></h3>
+            <div id="five-day-forecast" class="d-flex justify-content-between"></div>
+        </div>
+        <div id="empty" class="col-12 col-lg-2"></div>
     </div>
-    <div class="col-12 col-lg-9">
-        <div id="city"></div>
-        <div id="5-day-forecast"></div>
-    </div>
-
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.3/dayjs.min.js"
+    integrity="sha256-iu/zLUB+QgISXBLCW/mcDi/rnf4m4uEDO0wauy76x7U=" crossorigin="anonymous"></script>
     <script src="assets/index.js"></script>
 </body>
 </html>

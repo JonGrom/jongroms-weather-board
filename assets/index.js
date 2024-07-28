@@ -20,8 +20,9 @@ async function search(){
     let city = $("#search-input").val()
     let coordParams = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${APIkey}`
     let latLon = await getCoordinates(coordParams)
-    let data = await getWeather(latLon[0].lat, latLon[0].lon)
-    renderSearch(data)
+    let weather = await getWeather(latLon[0].lat, latLon[0].lon)
+    let forecasts = await getForecasts(latLon[0].lat, latLon[0].lon)
+    renderSearch(city, weather, forecasts)
 }
 
 
@@ -33,12 +34,73 @@ async function getCoordinates(coordParams){
 };
 
 async function getWeather(lat, lon){
-    let resp = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${APIkey}`);
-    let data = await resp.json();
-    console.log(data)
+    let resp = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${APIkey}`);
+    let weather = await resp.json();
+    console.log(weather)
+    return weather
 }
 
-function renderSearch(data){
+async function getForecasts(lat, lon){
+    let resp = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${APIkey}`);
+    let data = await resp.json();
+    let forecasts = data.list.filter((forecast, index) => index % 8 === 0)
+    console.log(forecasts)
+    return forecasts
+}
+
+function renderSearch(city, weather, forecasts){
+    console.log (forecasts)
+
+    //Revert html
+    $('#current').html("")
+    $('#five-day-forecast').html("")
+    $('#five-day-title').html("")
+
+    //Build current weather data
+    const currentCard = $('#current')
+    .addClass('border border-2 border-dark')
+    .append($('<h2>')
+        .text(`${city} (${dayjs().format('M/D/YYYY')})`)
+    )
+    //append icon
+    .append($('<p>')
+        .text(`Temp: ${weather.main.temp}°F`)
+    )
+    .append($('<p>')
+    .text(`Wind: ${weather.wind.speed} MPH`)
+    )
+    .append($('<p>')
+        .text(`Humidity: ${weather.main.humidity} %`)
+    )
+    
+    //Build 5-day  forecast cards
+    $('#five-day-title').text("5-Day Forecast:")
+
+    for (i=0; i<forecasts.length; i++){
+        $('#five-day-forecast')
+        .append($('<div>')
+            .addClass('bg-primary m-2 p-2')
+            .append($('<h3>')
+                .addClass('text-white')
+                .text(`${dayjs(forecasts[i].dt_txt).format('M/D/YYYY')}`)
+            )
+            //append icon
+            .append($('<p>')
+                .addClass('text-white')
+                .text(`Temp: ${forecasts[i].main.temp}°F`)
+            )
+            .append($('<p>')
+                .addClass('text-white')
+                .text(`Wind: ${forecasts[i].wind.speed} MPH`)
+            )
+            .append($('<p>')
+                .addClass('text-white')
+                .text(`Humidity: ${forecasts[i].main.humidity} %`)
+            )
+        )
+    }
+    
+
 
 }
 //use weather data to build page

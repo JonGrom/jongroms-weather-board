@@ -1,28 +1,44 @@
-APIkey = "bf85452823f8c175453a602a3c49c748";
+//Declare API key and get search histroy from local storage
+const APIkey = "bf85452823f8c175453a602a3c49c748";
+let searchHistory = JSON.parse(localStorage.getItem("searches"));
 
 // https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
 
 // ```
-// GIVEN a weather dashboard with form inputs
-// WHEN I search for a city
-// THEN I am presented with current and future conditions for that city and that city is added to the search history
-// WHEN I view current weather conditions for that city
-// THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, and the wind speed
+// THEN I am presented with an icon representation of weather conditionsd
 // WHEN I view future weather conditions for that city
 // THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
 // WHEN I click on a city in the search history
 // THEN I am again presented with current and future conditions for that city
 // ```
 
-
-
-async function search(){
+function search(){
+    //Update search history
     let city = $("#search-input").val()
+    searchHistory.push(city)
+    searchHistory.sort()
+    localStorage.setItem('searches', JSON.stringify(searchHistory))
+
+    //makeCalls
+    apiCalls(city)
+
+}
+
+function historySearch(event){
+    let city = event.target.dataset.city
+    console.log(event.target)
+    console.log(city)
+    apiCalls(city)
+}
+
+//Call OpenWeatherMap's API to get coordinates, current weather, and a 5-day forecast
+async function apiCalls(city){
     let coordParams = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${APIkey}`
     let latLon = await getCoordinates(coordParams)
     let weather = await getWeather(latLon[0].lat, latLon[0].lon)
     let forecasts = await getForecasts(latLon[0].lat, latLon[0].lon)
-    renderSearch(city, weather, forecasts)
+    renderForecast(city, weather, forecasts)
+    renderSearches()
 }
 
 
@@ -48,7 +64,7 @@ async function getForecasts(lat, lon){
     return forecasts
 }
 
-function renderSearch(city, weather, forecasts){
+function renderForecast(city, weather, forecasts){
     console.log (forecasts)
 
     //Revert html
@@ -80,10 +96,11 @@ function renderSearch(city, weather, forecasts){
         $('#five-day-forecast')
         .append($('<div>')
             .addClass('bg-primary m-2 p-2')
-            .append($('<h3>')
+            .append($('<h5>')
                 .addClass('text-white')
                 .text(`${dayjs(forecasts[i].dt_txt).format('M/D/YYYY')}`)
             )
+            .append('<a href="https://www.flaticon.com/free-icons/rain" title="rain icons">Rain icons created by iconixar - Flaticon</a>')
             //append icon
             .append($('<p>')
                 .addClass('text-white')
@@ -97,20 +114,28 @@ function renderSearch(city, weather, forecasts){
                 .addClass('text-white')
                 .text(`Humidity: ${forecasts[i].main.humidity} %`)
             )
-        )
-    }
-    
-
-
+        );
+    };
 }
-//use weather data to build page
 
-//store search history in local storage
+function renderSearches(){
+
+    $('#search-history').html("")
+    searchHistory.forEach( (city) => {
+        $('#search-history')
+        .append($('<button>')
+            .addClass('btn-secondary mb-3 rounded p-1')
+            .text(city)
+            .attr('data-city', city)
+            .on('click', historySearch)
+        )
+    })
+}
 
 $(document).ready(function (){
+    if (!searchHistory){
+        searchHistory = []
+    }
+    renderSearches()
     $('#search-btn').on('click', search)
-
-
-
-
 })

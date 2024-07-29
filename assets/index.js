@@ -1,6 +1,7 @@
 //Declare API key and get search histroy from local storage
 const APIkey = "bf85452823f8c175453a602a3c49c748";
 let searchHistory = JSON.parse(localStorage.getItem("searches"));
+// localStorage.clear()
 
 // https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
 
@@ -13,11 +14,13 @@ let searchHistory = JSON.parse(localStorage.getItem("searches"));
 // ```
 
 function search(){
-    //Update search history
+    //Check for previous invalid response
+    if ($('#invalid')){
+        $('#invalid').remove()
+    }
+
+    //define city
     let city = $("#search-input").val()
-    searchHistory.push(city)
-    searchHistory.sort()
-    localStorage.setItem('searches', JSON.stringify(searchHistory))
 
     //makeCalls
     apiCalls(city)
@@ -33,19 +36,37 @@ function historySearch(event){
 
 //Call OpenWeatherMap's API to get coordinates, current weather, and a 5-day forecast
 async function apiCalls(city){
+    //Get coorinates from city name
     let coordParams = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${APIkey}`
     let latLon = await getCoordinates(coordParams)
-    let weather = await getWeather(latLon[0].lat, latLon[0].lon)
-    let forecasts = await getForecasts(latLon[0].lat, latLon[0].lon)
-    renderForecast(city, weather, forecasts)
-    renderSearches()
+    console.log(latLon)
+    //Check Validity
+
+    if(!latLon[0] || !latLon[0].lat){
+        $('#search-area').append($('<p id="invalid">').addClass('text-danger').text('Invalid City Name!'))
+    } else {
+
+        //Do not repeat searches in histroy
+        searchHistory = searchHistory.filter( (value) => { 
+            return value !== city })
+
+        //Update Local Storage
+        searchHistory.push(city)
+        searchHistory.sort()
+        localStorage.setItem('searches', JSON.stringify(searchHistory))
+
+        //Get forescasts from coordinates
+        let weather = await getWeather(latLon[0].lat, latLon[0].lon)
+        let forecasts = await getForecasts(latLon[0].lat, latLon[0].lon)
+        renderForecast(city, weather, forecasts)
+        renderSearches()
+    }
 }
 
 
 async function getCoordinates(coordParams){
     const resp = await fetch(coordParams);
     const data = await resp.json();
-    console.log(data)
     return data
 };
 
@@ -133,9 +154,11 @@ function renderSearches(){
 }
 
 $(document).ready(function (){
-    if (!searchHistory){
+    if (searchHistory){
+        renderSearches()
+    } else {
         searchHistory = []
     }
-    renderSearches()
+
     $('#search-btn').on('click', search)
 })

@@ -37,7 +37,7 @@ function historySearch(event){
 //Call OpenWeatherMap's API to get coordinates, current weather, and a 5-day forecast
 async function apiCalls(city){
     //Get coorinates from city name
-    let coordParams = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${APIkey}`
+    let coordParams = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${APIkey}`
     let latLon = await getCoordinates(coordParams)
     console.log(latLon)
     //Check Validity

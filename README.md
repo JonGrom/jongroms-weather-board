@@ -6,4 +6,4 @@ In this assignment I utilized my knowledge of API calling to build an applicatio
 [Click here to see the deployed version](https://jongrom.github.io/jongroms-weather-board/)
 
 ## Screenshot of the Deployed Version
-![Screenshot of the web page](./assets/image/screenshot.png)
+![Screenshot of the web page](./assets/images/screenshot.png)

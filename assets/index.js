@@ -99,7 +99,7 @@ function renderForecast(city, weather, forecasts){
     .append($('<h2>')
         .text(`${city} (${dayjs().format('M/D/YYYY')})`)
     )
-    //append icon
+    .append($(`<img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png">`))
     .append($('<p>')
         .text(`Temp: ${weather.main.temp}°F`)
     )
@@ -116,12 +116,12 @@ function renderForecast(city, weather, forecasts){
     for (i=0; i<forecasts.length; i++){
         $('#five-day-forecast')
         .append($('<div>')
-            .addClass('bg-primary m-2 p-2')
+            .addClass('bg-primary p-4')
             .append($('<h5>')
                 .addClass('text-white')
                 .text(`${dayjs(forecasts[i].dt_txt).format('M/D/YYYY')}`)
             )
-            .append('<a href="https://www.flaticon.com/free-icons/rain" title="rain icons">Rain icons created by iconixar - Flaticon</a>')
+            .append($(`<img src="https://openweathermap.org/img/wn/${forecasts[i].weather[0].icon}@2x.png">`))
             //append icon
             .append($('<p>')
                 .addClass('text-white')
